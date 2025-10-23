@@ -1,0 +1,15 @@
+{
+	"name": "eons-dev-launcher",
+	"version": "0.0.0",
+	"description": "Injects an 'Open' button on git pages to launch an Eons workspace.",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build"
+	},
+	"devDependencies": {
+		"vite-plugin-web-extension": "^4.4.3",
+		"typescript": "^5.8.2",
+		"vite": "^6.2.3"
+	}
+  }
+  
