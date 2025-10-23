@@ -13,53 +13,51 @@ jobs:
 
     steps:
       # -----------------------------------------------------------------------------
-      # Checkout repository at the current commit
-      # Ensures we have full access to the code and commit metadata
+      # Checkout repository at the current commit.
+      # This ensures that the workflow runs against the latest code pushed
+      # to main, develop, or a PR branch.
       # -----------------------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # -----------------------------------------------------------------------------
-      # Install pnpm BEFORE Node setup.
-      # This ensures that actions/setup-node can detect pnpm and set up caching.
-      # The "run_install: false" flag defers the install step until later.
+      # Setup pnpm (v9) and enable built-in cache.
+      # This automatically caches pnpm’s global store between workflow runs.
+      # We install pnpm before Node.js so the cache is recognized properly.
       # -----------------------------------------------------------------------------
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
+          cache: true
 
       # -----------------------------------------------------------------------------
-      # Setup Node.js (v22) with built-in pnpm cache support.
-      # This automatically caches pnpm’s global store between builds,
-      # keyed by the hash of your pnpm-lock.yaml.
+      # Setup Node.js (v22).
+      # No caching is needed here because pnpm’s action handles it directly.
       # -----------------------------------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       # -----------------------------------------------------------------------------
-      # Install all dependencies using a frozen lockfile.
-      # The --frozen-lockfile flag ensures reproducibility
-      # and fails the build if package versions have drifted.
+      # Install dependencies using the locked versions from pnpm-lock.yaml.
+      # This ensures reproducible builds and avoids accidental version drift.
       # -----------------------------------------------------------------------------
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       # -----------------------------------------------------------------------------
-      # Run your build command. This should generate the "dist" directory
-      # containing the compiled extension files.
+      # Build the browser extension.
+      # The build command should generate the production-ready "dist/" directory.
       # -----------------------------------------------------------------------------
       - name: Build extension
         run: pnpm build
 
       # -----------------------------------------------------------------------------
-      # Upload the generated build artifacts as an action artifact.
-      # This allows later workflows (e.g., release) or reviewers
-      # to download and inspect the build output directly from the Actions tab.
+      # Upload the built "dist/" folder as an artifact.
+      # This allows developers or later workflows (like release) to download and verify it.
       # -----------------------------------------------------------------------------
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

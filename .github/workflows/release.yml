@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*"   # Triggers only when a tag starting with "v" (e.g. v1.0.0) is pushed
+      - "v*"   # Trigger only when pushing version tags, e.g., v1.0.0
 
 jobs:
   release:
@@ -11,7 +11,7 @@ jobs:
     name: Build & publish release
 
     # -----------------------------------------------------------------------------
-    # GitHub requires "contents: write" permission for creating releases.
+    # GitHub requires "contents: write" permission to create or update releases.
     # Without this, the softprops/action-gh-release step will fail with 403 errors.
     # -----------------------------------------------------------------------------
     permissions:
@@ -19,66 +19,64 @@ jobs:
 
     steps:
       # -----------------------------------------------------------------------------
-      # Checkout the repository at the tagged commit so that the build
-      # represents the exact source snapshot being released.
+      # Checkout the repository at the tagged commit so that the built artifacts
+      # exactly match the released version.
       # -----------------------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # -----------------------------------------------------------------------------
-      # Install pnpm first so setup-node can properly cache pnpm’s store.
+      # Setup pnpm (v9) and enable built-in cache.
+      # Handles caching internally to avoid race conditions.
       # -----------------------------------------------------------------------------
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
+          cache: true
 
       # -----------------------------------------------------------------------------
-      # Install Node.js 22 and enable pnpm cache integration.
-      # The combination of pnpm/action-setup and setup-node ensures
-      # both consistent environment and fast rebuilds.
+      # Setup Node.js (v22) — no cache flag is needed since pnpm manages it.
       # -----------------------------------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       # -----------------------------------------------------------------------------
-      # Install dependencies exactly as locked in pnpm-lock.yaml.
+      # Install dependencies using frozen lockfile for deterministic builds.
       # -----------------------------------------------------------------------------
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       # -----------------------------------------------------------------------------
-      # Build the extension to produce the distributable files in /dist.
+      # Run the build command to generate the extension distributable files.
       # -----------------------------------------------------------------------------
       - name: Build extension
         run: pnpm build
 
       # -----------------------------------------------------------------------------
-      # Package the Chrome (and optionally Firefox) versions into zip archives.
-      # These archives will be uploaded as release assets.
+      # Package the Chrome (and optionally Firefox) build into ZIP files.
+      # The version tag name is automatically appended to each filename.
       # -----------------------------------------------------------------------------
       - name: Create ZIP packages
         run: |
           cd dist
           zip -r ../eons-dev-launcher-chrome-${{ github.ref_name }}.zip .
           cd ..
-          # To build and attach a Firefox variant, uncomment below:
+          # To include a Firefox build, uncomment below:
           # cp -r dist dist-firefox
           # cd dist-firefox
           # zip -r ../eons-dev-launcher-firefox-${{ github.ref_name }}.zip .
           # cd ..
 
       # -----------------------------------------------------------------------------
-      # Create a GitHub Release and upload artifacts automatically.
-      # - softprops/action-gh-release@v2 handles both the release creation
-      #   and asset upload.
-      # - Using "with.token" (rather than env) is the new standard.
+      # Create a GitHub Release and upload the built ZIPs as release assets.
+      # - Uses softprops/action-gh-release@v2, the maintained modern version.
+      # - Uses the new "token" input instead of deprecated env variables.
       # - The built-in ${{ secrets.GITHUB_TOKEN }} is automatically created
-      #   for each workflow run; no manual setup required.
+      #   for each workflow run; no manual secret setup is needed.
       # -----------------------------------------------------------------------------
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -86,6 +84,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             eons-dev-launcher-chrome-${{ github.ref_name }}.zip
+            # eons-dev-launcher-firefox-${{ github.ref_name }}.zip
           generate_release_notes: true
           draft: false
           prerelease: false
