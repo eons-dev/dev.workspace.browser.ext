@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build extension
+
+    steps:
+      # ---------------------------------------------
+      # 1. Checkout repository
+      # ---------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------
+      # 2. Setup Node.js and enable pnpm caching
+      # ---------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'       # Use Node.js version 22.x
+          cache: 'pnpm'            # Enable built-in pnpm caching support
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9              # Use pnpm v9 (or whatever your project uses)
+          run_install: false      # We will run install explicitly below
+
+      # ---------------------------------------------
+      # 3. Install dependencies (locked)
+      # ---------------------------------------------
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ---------------------------------------------
+      # 4. Build extension
+      # ---------------------------------------------
+      - name: Build
+        run: pnpm build
+
+      # ---------------------------------------------
+      # 5. Upload build artifacts
+      # ---------------------------------------------
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: eons-dev-launcher-build
+          path: dist/
+          retention-days: 7
