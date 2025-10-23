@@ -1,3 +1,5 @@
+packages:
+  - .
 onlyBuiltDependencies:
   - dtrace-provider
   - esbuild
