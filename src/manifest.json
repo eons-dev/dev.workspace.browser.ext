@@ -2,8 +2,12 @@
 	"manifest_version": 3,
 	"name": "Eons Dev Launcher",
 	"version": "1.0",
-	"description": "Adds an 'Open' button to git repos to launch an Eons workspace.",
-	"permissions": [],
+	"description": "Adds an 'Open' button to git repos to launch a dev workspace.",
+	"permissions": ["storage"],
+	"options_ui": {
+		"page": "src/options.html",
+		"open_in_tab": true
+	},
 	"host_permissions": [
 	  "https://github.com/*",
 	  "https://gitlab.com/*",
