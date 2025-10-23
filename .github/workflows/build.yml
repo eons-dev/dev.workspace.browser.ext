@@ -12,42 +12,55 @@ jobs:
     name: Build extension
 
     steps:
-      # ---------------------------------------------
-      # 1. Checkout repository
-      # ---------------------------------------------
-      - name: Checkout code
+      # -----------------------------------------------------------------------------
+      # Checkout repository at the current commit
+      # Ensures we have full access to the code and commit metadata
+      # -----------------------------------------------------------------------------
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ---------------------------------------------
-      # 2. Setup Node.js and enable pnpm caching
-      # ---------------------------------------------
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '22'       # Use Node.js version 22.x
-          cache: 'pnpm'            # Enable built-in pnpm caching support
-
+      # -----------------------------------------------------------------------------
+      # Install pnpm BEFORE Node setup.
+      # This ensures that actions/setup-node can detect pnpm and set up caching.
+      # The "run_install: false" flag defers the install step until later.
+      # -----------------------------------------------------------------------------
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9              # Use pnpm v9 (or whatever your project uses)
-          run_install: false      # We will run install explicitly below
+          version: 9
+          run_install: false
 
-      # ---------------------------------------------
-      # 3. Install dependencies (locked)
-      # ---------------------------------------------
+      # -----------------------------------------------------------------------------
+      # Setup Node.js (v22) with built-in pnpm cache support.
+      # This automatically caches pnpm’s global store between builds,
+      # keyed by the hash of your pnpm-lock.yaml.
+      # -----------------------------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      # -----------------------------------------------------------------------------
+      # Install all dependencies using a frozen lockfile.
+      # The --frozen-lockfile flag ensures reproducibility
+      # and fails the build if package versions have drifted.
+      # -----------------------------------------------------------------------------
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ---------------------------------------------
-      # 4. Build extension
-      # ---------------------------------------------
-      - name: Build
+      # -----------------------------------------------------------------------------
+      # Run your build command. This should generate the "dist" directory
+      # containing the compiled extension files.
+      # -----------------------------------------------------------------------------
+      - name: Build extension
         run: pnpm build
 
-      # ---------------------------------------------
-      # 5. Upload build artifacts
-      # ---------------------------------------------
+      # -----------------------------------------------------------------------------
+      # Upload the generated build artifacts as an action artifact.
+      # This allows later workflows (e.g., release) or reviewers
+      # to download and inspect the build output directly from the Actions tab.
+      # -----------------------------------------------------------------------------
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
