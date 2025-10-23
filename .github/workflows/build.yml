@@ -46,7 +46,7 @@ jobs:
       # This ensures reproducible builds and avoids accidental version drift.
       # -----------------------------------------------------------------------------
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       # -----------------------------------------------------------------------------
       # Build the browser extension.

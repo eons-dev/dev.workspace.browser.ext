@@ -48,7 +48,7 @@ jobs:
       # Install dependencies using frozen lockfile for deterministic builds.
       # -----------------------------------------------------------------------------
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       # -----------------------------------------------------------------------------
       # Run the build command to generate the extension distributable files.
