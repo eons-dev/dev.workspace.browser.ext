@@ -62,11 +62,11 @@ jobs:
       # -----------------------------------------------------------------------------
       - name: Create ZIP packages
         run: |
-          cd dist
+          cd eons-dev-launcher
           zip -r ../eons-dev-launcher-chrome-${{ github.ref_name }}.zip .
           cd ..
           # To include a Firefox build, uncomment below:
-          # cp -r dist dist-firefox
+          # cp -r eons-dev-launcher dist-firefox
           # cd dist-firefox
           # zip -r ../eons-dev-launcher-firefox-${{ github.ref_name }}.zip .
           # cd ..
