@@ -9,9 +9,9 @@
 		"open_in_tab": true
 	},
 	"host_permissions": [
-	  "https://github.com/*",
-	  "https://gitlab.com/*",
-	  "https://git.infrastructure.tech/*"
+		"https://github.com/*",
+		"https://gitlab.com/*",
+		"https://git.infrastructure.tech/*"
 	],
 	"content_scripts": [
 		{
@@ -25,7 +25,13 @@
 		}
 	],
 	"action": {
-	  "default_title": "Eons Dev Launcher"
+		"default_title": "Eons Dev Launcher"
+	},
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "dev.launcher@eons",
+			"strict_min_version": "115.0"
+		}
 	}
-  }
-  
+}
+	

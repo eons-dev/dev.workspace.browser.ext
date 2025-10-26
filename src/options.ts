@@ -14,6 +14,8 @@
  * to generate correct workspace URLs for injected “Open” buttons.
  */
 
+import browser from 'webextension-polyfill'
+
 /* =========================================================================================
  *  1. Constants
  * =======================================================================================*/
@@ -37,7 +39,7 @@ const DEFAULT_BASE_URL = "https://workspace.infrastructure.tech/#/cast/dev?kasm_
 
 /**
  * Wait until the DOM is fully parsed before accessing elements.
- * The async callback allows use of `await chrome.storage.sync.get()`.
+ * The async callback allows use of `await browser.storage.sync.get()`.
  */
 document.addEventListener("DOMContentLoaded", async () => {
 	/* -----------------------------------------------------------------------------
@@ -45,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	 *  Uses destructuring to directly extract `baseUrl` (if present).
 	 * --------------------------------------------------------------------------- */
 	// @ts-ignore // Chrome types may not be available in all build contexts
-	const { [KEY]: stored } = await chrome.storage.sync.get(KEY)
+	const { [KEY]: stored } = await browser.storage.sync.get(KEY)
 
 	/* -----------------------------------------------------------------------------
 	 *  Query DOM elements for input field, save button, and status label.
@@ -89,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 			// Save cleaned URL (remove trailing slashes)
 			// @ts-ignore // Chrome types may not be available in all build contexts
-			await chrome.storage.sync.set({
+			await browser.storage.sync.set({
 				[KEY]: urlToStore.toString().replace(/\/+$/, ""),
 			})
 

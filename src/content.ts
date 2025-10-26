@@ -7,7 +7,7 @@
  * It prevents duplicate injections, waits for Chrome storage to load user configuration,
  * and handles async race conditions gracefully.
  */
-
+import browser from 'webextension-polyfill'
 import { buttonContributions, isSiteSuitable } from "./button-contributions"
 
 /* =========================================================================================
@@ -27,7 +27,7 @@ async function getBaseUrl(): Promise<string> {
 	return new Promise((resolve) => {
 		try {
 			//@ts-ignore // Chrome types may not be available in all build contexts
-			chrome.storage.sync.get("baseUrl", (res) => {
+			browser.storage.sync.get("baseUrl", (res) => {
 				// Resolve with stored value, or default if undefined
 				resolve(res.baseUrl || DEFAULT_BASE_URL)
 			})

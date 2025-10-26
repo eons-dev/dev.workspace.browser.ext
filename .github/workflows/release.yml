@@ -65,11 +65,10 @@ jobs:
           cd eons-dev-launcher
           zip -r ../eons-dev-launcher-chrome-${{ github.ref_name }}.zip .
           cd ..
-          # To include a Firefox build, uncomment below:
-          # cp -r eons-dev-launcher dist-firefox
-          # cd dist-firefox
-          # zip -r ../eons-dev-launcher-firefox-${{ github.ref_name }}.zip .
-          # cd ..
+          cp -r eons-dev-launcher dist-firefox
+          cd dist-firefox
+          zip -r ../eons-dev-launcher-firefox-${{ github.ref_name }}.zip .
+          cd ..
 
       # -----------------------------------------------------------------------------
       # Create a GitHub Release and upload the built ZIPs as release assets.
@@ -84,7 +83,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             eons-dev-launcher-chrome-${{ github.ref_name }}.zip
-            # eons-dev-launcher-firefox-${{ github.ref_name }}.zip
+            eons-dev-launcher-firefox-${{ github.ref_name }}.zip
           generate_release_notes: true
           draft: false
           prerelease: false
