@@ -4,7 +4,10 @@
 	"description": "Injects an 'Open' button on git pages to launch an Eons workspace.",
 	"scripts": {
 		"dev": "vite",
-		"build": "vite build"
+		"build": "pnpm run prebuild && vite build",
+		"prebuild": "node sh/copy-manifest.js",
+		"build:chrome": "BROWSER=chromium pnpm run build",
+		"build:firefox": "BROWSER=gecko pnpm run build"
 	},
 	"devDependencies": {
 		"typescript": "^5.8.2",

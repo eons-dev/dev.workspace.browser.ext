@@ -3,3 +3,4 @@ node_modules
 dist
 eons-dev-launcher
 *lock.*
+src/manifest.json

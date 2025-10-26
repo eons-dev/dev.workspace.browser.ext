@@ -32,7 +32,9 @@ async function getBaseUrl(): Promise<string> {
 				resolve(res.baseUrl || DEFAULT_BASE_URL)
 			})
 		} catch (err) {
-			console.error("Error loading base URL from storage:", err)
+			// NOTE: this will fire if storage was never set.
+			// console.error("Error loading base URL from storage:", err)
+
 			// Always resolve with default even on error to avoid blocking injection
 			resolve(DEFAULT_BASE_URL)
 		}

@@ -1,87 +1,132 @@
 # Eons Dev Launcher
 
-**Eons Dev Launcher** is a lightweight browser extension that injects an **"Open"** button on GitHub, GitLab, and [git.infrastructure.tech](https://git.infrastructure.tech) repository pages. The button opens the current repository in a Kasm workspace at:
+**Eons Dev Launcher** is a lightweight browser extension that injects an **"Open"** button on GitHub, GitLab, and [git.infrastructure.tech](https://git.infrastructure.tech) repository pages. Clicking this button launches the current repository in a **workspace environment** such as **Kasm** or **Coder**.
+
+For Kasm:
 
 ```
 https://workspace.infrastructure.tech/#/cast/dev?kasm_url=<CURRENT_REPO_URL>
 ```
 
-Original code taken from [gitpod](https://github.com/gitpod-io/browser-extension) and rebuilt to build on linux, etc.
+For Coder:
 
----
+```
+https://coder.example.com/templates/devcontainer/workspace?param.repo_url=<CURRENT_REPO_URL>
+```
+
+Originally forked from [Gitpod's browser extension](https://github.com/gitpod-io/browser-extension) and rebuilt for cross-platform compatibility (Linux, macOS, Windows) and modern build tooling.
 
 ## Features
 
-- Adds an **"Open"** button directly on GitHub, GitLab, and git.infrastructure.tech pages  
-- Launches a new development workspace for the current repo  
-- Minimal, no tracking, no accounts 
-- Only supports **Chrome** at the moment (Firefox support coming soon)
+* Adds an **"Open"** button on GitHub, GitLab, and git.infrastructure.tech repositories
+* Opens the repo in a dev workspace platform like **Kasm** or **Coder** with a single click
+* Works seamlessly on **Chrome** and **Firefox**
+* Lightweight—no tracking, no telemetry, no accounts required
+* Fully open-source under the MIT license
 
----
+## Development Setup
 
-## Installation
+### 1. Clone the repository
 
-### For Development
+```bash
+git clone https://git.infrastructure.tech/eons/ext/browser/dev.workspace.git
+cd dev.workspace
+```
 
-1. Clone the repo:
+### 2. Install dependencies
 
-   ```bash
-   git clone https://git.infrastructure.tech/eons/ext/browser/dev.workspace.git
-   cd dev.workspace
-   ```
+```bash
+pnpm install
+```
 
-2. Install dependencies:
+### 3. Build for your target browser
 
-   ```bash
-   pnpm install
-   ```
+You can build both versions or just one, depending on your needs.
 
-3. Build the extension:
+All builds output to the same `eons-dev-launcher/` folder.
 
-   ```bash
-   pnpm build
-   ```
+It is recommended to clean the output folder between builds if switching browsers.
 
-4. Load into your browser:
+#### Chrome build
 
-   - **Chrome**:  
-     - Go to `chrome://extensions`  
-     - Enable **Developer Mode**  
-     - Click **Load unpacked** → Select the `eons-dev-launcher/` folder
+```bash
+pnpm run build:chrome
+```
 
-   - **Firefox**:  
-     - Go to `about:debugging#/runtime/this-firefox`  
-     - Click **Load Temporary Add-on**  
-     - Choose the generated `manifest.json` inside `eons-dev-launcher/`
+#### Firefox build
 
----
+```bash
+pnpm run build:firefox
+```
 
-## How it Works
+The Firefox build automatically injects the required `"browser_specific_settings"` → `gecko.id` block for AMO signing and installs.
 
-The extension uses a content script to:
-- Detect repo pages
-- Inject an `"Open"` button near the repo title
-- Link it to a pre-configured workspace URL with the current page as a parameter
+## Loading the Extension (Development Mode)
 
----
+### Chrome / Chromium / Edge
+
+1. Open `chrome://extensions`
+2. Enable **Developer mode** (toggle in the top-right corner)
+3. Click **Load unpacked**
+4. Select the `eons-dev-launcher/` folder
+5. The "Eons Dev Launcher" icon will appear in your toolbar.
+
+
+### Firefox
+
+1. Open `about:debugging#/runtime/this-firefox`
+2. Click **Load Temporary Add-on**
+3. Select the `manifest.json` inside the `eons-dev-launcher/` folder
+4. The extension will appear in your toolbar for this session.
+
+Note: Temporary add-ons are removed when Firefox restarts.
+
+
+## How It Works
+
+The extension injects a lightweight content script that:
+
+1. Detects when you’re viewing a supported repository (GitHub, GitLab, or git.infrastructure.tech)
+2. Injects an **"Open"** button near the repo title or toolbar
+3. When clicked, it opens one of the following, depending on configuration:
+
+   * Kasm: `https://workspace.infrastructure.tech/#/cast/dev?kasm_url=<CURRENT_REPO_URL>`
+   * Coder: `https://coder.example.com/templates/devcontainer/workspace?param.repo_url=<CURRENT_REPO_URL>`
+
 
 ## Customization
 
-To point to a different workspace:
+You can configure the base workspace URL if you host your own environment.
 
-1. Go to the extension's options page:
-   - **Chrome**: `chrome://extensions` → Find **Eons Dev Launcher** → Click **Details** → Click **Extension options**
+### Change the base URL
 
-   ![Extension Options](./doc/asset/chrome-options.png)
+1. Open the extension’s **Options** page:
 
-2. Enter your desired base URL (e.g. `https://workspace.infrastructure.tech/#/cast/dev?kasm_url=`)
+   * **Chrome:** `chrome://extensions` → **Eons Dev Launcher** → **Details** → **Extension options**
+
+   ![Chrome Extension Options](./doc/asset/chrome-options.png)
+
+   * **Firefox:** Right-click the extension icon → **Manage Extension** → kebab → **Preferences**
+
+   ![Firefox Extension Options](./doc/asset/firefox-options.png)
+
+2. Enter a custom workspace base URL, for example:
+
+   ```
+   https://workspace.infrastructure.tech/#/cast/dev?kasm_url=
+   ```
+
+   or for Coder:
+
+   ```
+   https://coder.example.com/templates/devcontainer/workspace?param.repo_url=
+   ```
 
    ![Settings Page](./doc/asset/settings-page.png)
 
+3. Save changes—the button will now open your custom environment.
 
----
 
 ## License
 
-MIT © [Eons](https://infrastructure.tech)
-
+MIT © [Eons LLC](https://infrastructure.tech)

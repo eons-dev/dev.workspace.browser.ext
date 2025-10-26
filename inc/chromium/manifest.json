@@ -1,0 +1,30 @@
+{
+	"manifest_version": 3,
+	"name": "Eons Dev Launcher",
+	"version": "1.0",
+	"description": "Adds an 'Open' button to git repos to launch a dev workspace.",
+	"permissions": ["storage"],
+	"options_ui": {
+		"page": "src/options.html",
+		"open_in_tab": true
+	},
+	"host_permissions": [
+		"https://github.com/*",
+		"https://gitlab.com/*",
+		"https://git.infrastructure.tech/*"
+	],
+	"content_scripts": [
+		{
+			"matches": [
+				"https://github.com/*",
+				"https://gitlab.com/*",
+				"https://git.infrastructure.tech/*"
+			],
+			"js": ["src/content.ts"],
+			"css": ["src/style.css"]
+		}
+	],
+	"action": {
+		"default_title": "Eons Dev Launcher"
+	}
+}

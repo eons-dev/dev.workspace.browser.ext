@@ -51,22 +51,27 @@ jobs:
         run: pnpm install
 
       # -----------------------------------------------------------------------------
-      # Run the build command to generate the extension distributable files.
+      # Run the build command to generate the Chrome and Firefox distributables.
       # -----------------------------------------------------------------------------
-      - name: Build extension
-        run: pnpm build
+      - name: Build Firefox extension
+        run: |
+          pnpm run build:firefox
+          mv eons-dev-launcher dist-firefox
+      
+      - name: Build Chrome extension
+        run: |
+          pnpm run build:chrome
+          mv eons-dev-launcher dist-chrome
 
       # -----------------------------------------------------------------------------
-      # Package the Chrome (and optionally Firefox) build into ZIP files.
+      # Package the Chrome and Firefox builds into ZIP files.
       # The version tag name is automatically appended to each filename.
       # -----------------------------------------------------------------------------
       - name: Create ZIP packages
         run: |
-          cd eons-dev-launcher
+          cd dist-chrome
           zip -r ../eons-dev-launcher-chrome-${{ github.ref_name }}.zip .
-          cd ..
-          cp -r eons-dev-launcher dist-firefox
-          cd dist-firefox
+          cd ../dist-firefox
           zip -r ../eons-dev-launcher-firefox-${{ github.ref_name }}.zip .
           cd ..
 
