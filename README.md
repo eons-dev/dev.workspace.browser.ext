@@ -16,13 +16,79 @@ https://coder.example.com/templates/devcontainer/workspace?param.repo_url=<CURRE
 
 Originally forked from [Gitpod's browser extension](https://github.com/gitpod-io/browser-extension) and rebuilt for cross-platform compatibility (Linux, macOS, Windows) and modern build tooling.
 
+## How It Works
+
+The extension injects a lightweight content script that:
+
+1. Detects when you're viewing a supported repository (GitHub, GitLab, or git.infrastructure.tech)
+2. Injects an **"Open"** button near the repo title or toolbar
+3. When clicked, it opens one of the following, depending on configuration:
+
+   - Kasm: `https://workspace.infrastructure.tech/#/cast/dev?kasm_url=<CURRENT_REPO_URL>`
+   - Coder: `https://coder.example.com/templates/devcontainer/workspace?param.repo_url=<CURRENT_REPO_URL>`
+
 ## Features
 
-* Adds an **"Open"** button on GitHub, GitLab, and git.infrastructure.tech repositories
-* Opens the repo in a dev workspace platform like **Kasm** or **Coder** with a single click
-* Works seamlessly on **Chrome** and **Firefox**
-* Lightweight—no tracking, no telemetry, no accounts required
-* Fully open-source under the MIT license
+- Adds an **"Open"** button on GitHub, GitLab, and git.infrastructure.tech repositories
+- Opens the repo in a dev workspace platform like **Kasm** or **Coder** with a single click
+- Works seamlessly on **Chrome** and **Firefox**
+- Lightweight—no tracking, no telemetry, no accounts required
+- Fully open-source under the MIT license
+- **Liquid.js templating support** for flexible URL customization with dynamic variables
+
+## Customization
+
+You can configure the workspace URL using **Liquid.js templating** to create dynamic, flexible URLs.
+
+### Available Template Variables
+
+- `{{repoUrl}}` - The full URL of the current repository page
+- `{{branchName}}` - The branch name extracted from the current URL (if viewing a specific branch)
+
+### Change the URL Template
+
+1. Open the extension's **Options** page:
+
+   - **Chrome:** `chrome://extensions` → **Eons Dev Launcher** → **Details** → **Extension options**
+
+   ![Chrome Extension Options](./doc/asset/chrome-options.png)
+
+   - **Firefox:** Right-click the extension icon → **Manage Extension** → kebab → **Preferences**
+
+   ![Firefox Extension Options](./doc/asset/firefox-options.png)
+
+2. Enter a custom workspace URL template using Liquid.js syntax:
+
+   **Basic Kasm template:**
+
+   ```
+   https://workspace.infrastructure.tech/#/cast/dev?kasm_url={{repoUrl}}
+   ```
+
+   **Coder template with branch name (first 20 characters):**
+
+   ```
+   https://coder.appalachian.uplynx.io/templates/devcontainer/workspace?name={{branchName|slice:0,20}}&param.repo_url={{repoUrl}}
+   ```
+
+   **Important:** Liquid.js filter syntax requires **no spaces** around colons and commas in filter arguments.  
+   Unfortunately, the stored templates are currently encoded, so spaces, quotes, or other invalid characters will cause rendering errors.
+
+   ✅ **Correct:**
+
+   ```
+   {{branchName|slice:0,20}}
+   ```
+
+   ❌ **Incorrect (will cause errors):**
+
+   ```
+   {{branchName | slice: 0, 20}}
+   ```
+
+   ![Settings Page](./doc/asset/settings-page.png)
+
+3. Save changes—the button will now open your custom environment with the rendered template.
 
 ## Development Setup
 
@@ -71,7 +137,6 @@ The Firefox build automatically injects the required `"browser_specific_settings
 4. Select the `eons-dev-launcher/` folder
 5. The "Eons Dev Launcher" icon will appear in your toolbar.
 
-
 ### Firefox
 
 1. Open `about:debugging#/runtime/this-firefox`
@@ -80,52 +145,6 @@ The Firefox build automatically injects the required `"browser_specific_settings
 4. The extension will appear in your toolbar for this session.
 
 Note: Temporary add-ons are removed when Firefox restarts.
-
-
-## How It Works
-
-The extension injects a lightweight content script that:
-
-1. Detects when you’re viewing a supported repository (GitHub, GitLab, or git.infrastructure.tech)
-2. Injects an **"Open"** button near the repo title or toolbar
-3. When clicked, it opens one of the following, depending on configuration:
-
-   * Kasm: `https://workspace.infrastructure.tech/#/cast/dev?kasm_url=<CURRENT_REPO_URL>`
-   * Coder: `https://coder.example.com/templates/devcontainer/workspace?param.repo_url=<CURRENT_REPO_URL>`
-
-
-## Customization
-
-You can configure the base workspace URL if you host your own environment.
-
-### Change the base URL
-
-1. Open the extension’s **Options** page:
-
-   * **Chrome:** `chrome://extensions` → **Eons Dev Launcher** → **Details** → **Extension options**
-
-   ![Chrome Extension Options](./doc/asset/chrome-options.png)
-
-   * **Firefox:** Right-click the extension icon → **Manage Extension** → kebab → **Preferences**
-
-   ![Firefox Extension Options](./doc/asset/firefox-options.png)
-
-2. Enter a custom workspace base URL, for example:
-
-   ```
-   https://workspace.infrastructure.tech/#/cast/dev?kasm_url=
-   ```
-
-   or for Coder:
-
-   ```
-   https://coder.example.com/templates/devcontainer/workspace?param.repo_url=
-   ```
-
-   ![Settings Page](./doc/asset/settings-page.png)
-
-3. Save changes—the button will now open your custom environment.
-
 
 ## License
 

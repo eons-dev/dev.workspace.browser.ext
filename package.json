@@ -15,6 +15,7 @@
 		"vite-plugin-web-extension": "^4.4.3"
 	},
 	"dependencies": {
+		"liquidjs": "^10.24.0",
 		"webextension-polyfill": "^0.12.0"
 	}
 }

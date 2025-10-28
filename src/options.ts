@@ -2,13 +2,13 @@
  * options.ts
  * 
  * Handles the logic for the extension’s Options page, where the user can configure
- * their preferred workspace base URL (e.g., to point to a custom dev environment).
+ * their preferred workspace URL template (e.g., to point to a custom dev environment).
  * 
  * This script:
- *   1. Loads the currently stored base URL from Chrome’s sync storage.
+ *   1. Loads the currently stored URL template from the browser’s sync storage.
  *   2. Populates the settings form field with that URL.
  *   3. Validates user input when “Save” is clicked.
- *   4. Writes the new value back to Chrome storage if valid, and shows a short confirmation.
+ *   4. Writes the new value back to browser storage if valid, and shows a short confirmation.
  * 
  * The stored value is later read by `injectEonsButton()` in content scripts
  * to generate correct workspace URLs for injected “Open” buttons.
@@ -21,17 +21,17 @@ import browser from 'webextension-polyfill'
  * =======================================================================================*/
 
 /**
- * The key under which the base URL is stored in Chrome’s sync storage.
+ * The key under which the URL template is stored in the browser’s sync storage.
  * This key must be consistent across background, options, and content scripts.
  */
-const KEY = "baseUrl"
+const KEY = "urlTemplate"
 
 /**
- * Default base URL used when:
+ * Default URL template used when:
  * - No value has been saved yet, or
- * - Chrome storage fails to load.
+ * - Browser storage fails to load.
  */
-const DEFAULT_BASE_URL = "https://workspace.infrastructure.tech/#/cast/dev?kasm_url="
+const DEFAULT_URL_TEMPLATE = "https://workspace.infrastructure.tech/#/cast/dev?kasm_url={{repoUrl}}"
 
 /* =========================================================================================
  *  2. Initialization
@@ -43,17 +43,16 @@ const DEFAULT_BASE_URL = "https://workspace.infrastructure.tech/#/cast/dev?kasm_
  */
 document.addEventListener("DOMContentLoaded", async () => {
 	/* -----------------------------------------------------------------------------
-	 *  Load stored configuration value from Chrome storage.
-	 *  Uses destructuring to directly extract `baseUrl` (if present).
+	 *  Load stored configuration value from browser storage.
+	 *  Uses destructuring to directly extract `urlTemplate` (if present).
 	 * --------------------------------------------------------------------------- */
-	// @ts-ignore // Chrome types may not be available in all build contexts
 	const { [KEY]: stored } = await browser.storage.sync.get(KEY)
 
 	/* -----------------------------------------------------------------------------
 	 *  Query DOM elements for input field, save button, and status label.
 	 *  These are expected to exist in the options.html page.
 	 * --------------------------------------------------------------------------- */
-	const input = document.getElementById("baseUrl") as HTMLInputElement
+	const input = document.getElementById("urlTemplate") as HTMLInputElement
 	const saveBtn = document.getElementById("save") as HTMLButtonElement
 	const status = document.getElementById("status") as HTMLSpanElement
 
@@ -63,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	/* -----------------------------------------------------------------------------
 	 *  Initialize the input field with either stored or default value.
 	 * --------------------------------------------------------------------------- */
-	input.value = (stored as string) || DEFAULT_BASE_URL
+	input.value = (stored as string) || DEFAULT_URL_TEMPLATE
 
 	/* =====================================================================================
 	 *  3. Save Button Logic
@@ -73,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	 * Handles click events on the “Save” button.
 	 * - Validates that the entered text is a valid HTTP(S) URL.
 	 * - Removes any trailing slashes.
-	 * - Persists the cleaned URL into Chrome storage.
+	 * - Persists the cleaned URL into browser storage.
 	 * - Provides short user feedback (“Saved” or “Invalid URL”).
 	 */
 	saveBtn.addEventListener("click", async () => {
@@ -90,7 +89,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 			}
 
 			// Save cleaned URL (remove trailing slashes)
-			// @ts-ignore // Chrome types may not be available in all build contexts
 			await browser.storage.sync.set({
 				[KEY]: urlToStore.toString().replace(/\/+$/, ""),
 			})
