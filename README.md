@@ -68,7 +68,7 @@ You can configure the workspace URL using **Liquid.js templating** to create dyn
    **Coder template with branch name (first 20 characters):**
 
    ```
-   https://coder.appalachian.uplynx.io/templates/devcontainer/workspace?name={{branchName|slice:0,20}}&param.repo_url={{repoUrl}}
+   https://coder.example.com/templates/devcontainer/workspace?name={{branchName|slice:0,20}}&param.repo_url={{repoUrl}}
    ```
 
    **Important:** Liquid.js filter syntax requires **no spaces** around colons and commas in filter arguments.  
