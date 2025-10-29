@@ -57,7 +57,7 @@ jobs:
         run: |
           pnpm run build:firefox
           mv eons-dev-launcher dist-firefox
-      
+
       - name: Build Chrome extension
         run: |
           pnpm run build:chrome
@@ -77,10 +77,6 @@ jobs:
 
       # -----------------------------------------------------------------------------
       # Create a GitHub Release and upload the built ZIPs as release assets.
-      # - Uses softprops/action-gh-release@v2, the maintained modern version.
-      # - Uses the new "token" input instead of deprecated env variables.
-      # - The built-in ${{ secrets.GITHUB_TOKEN }} is automatically created
-      #   for each workflow run; no manual secret setup is needed.
       # -----------------------------------------------------------------------------
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -95,19 +91,28 @@ jobs:
 
       # -----------------------------------------------------------------------------
       # Publish the Firefox extension to Mozilla Add-ons (AMO).
-      # Requires AMO_ISSUER and AMO_SECRET secrets to be set in the repository
-      # settings for authentication.
+      # Requires AMO_ISSUER and AMO_SECRET secrets to be set in repository settings.
       # -----------------------------------------------------------------------------
       - name: Publish to Mozilla Add-ons (AMO)
         run: |
-          pnpm install -g web-ext
+          pnpm add -g web-ext
           web-ext sign \
             --source-dir=dist-firefox \
             --artifacts-dir=signed-artifacts \
-            --api-key=${{ secrets.AMO_ISSUER }} \
-            --api-secret=${{ secrets.AMO_SECRET }} \
+            --api-key="${{ secrets.AMO_ISSUER }}" \
+            --api-secret="${{ secrets.AMO_SECRET }}" \
             --channel=listed \
-            --id="dev.launcher@eons"
+            --verbose \
+            --no-input
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_SECRET }}
+
+      # -----------------------------------------------------------------------------
+      # Upload the signed Firefox .xpi file to the same GitHub Release.
+      # -----------------------------------------------------------------------------
+      - name: Upload signed Firefox XPI to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: signed-artifacts/*.xpi
