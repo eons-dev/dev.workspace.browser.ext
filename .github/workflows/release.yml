@@ -92,3 +92,22 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
+
+      # -----------------------------------------------------------------------------
+      # Publish the Firefox extension to Mozilla Add-ons (AMO).
+      # Requires AMO_ISSUER and AMO_SECRET secrets to be set in the repository
+      # settings for authentication.
+      # -----------------------------------------------------------------------------
+      - name: Publish to Mozilla Add-ons (AMO)
+        run: |
+          pnpm install -g web-ext
+          web-ext sign \
+            --source-dir=dist-firefox \
+            --artifacts-dir=signed-artifacts \
+            --api-key=${{ secrets.AMO_ISSUER }} \
+            --api-secret=${{ secrets.AMO_SECRET }} \
+            --channel=listed \
+            --id="dev.launcher@eons"
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_SECRET }}
