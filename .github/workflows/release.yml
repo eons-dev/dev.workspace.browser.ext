@@ -51,6 +51,12 @@ jobs:
         run: pnpm install
 
       # -----------------------------------------------------------------------------
+      # Update manifest versions to match the release tag
+      # -----------------------------------------------------------------------------
+      - name: Update manifest versions
+        run: node sh/update-version.js ${{ github.ref_name }}
+
+      # -----------------------------------------------------------------------------
       # Run the build command to generate the Chrome and Firefox distributables.
       # -----------------------------------------------------------------------------
       - name: Build Firefox extension
