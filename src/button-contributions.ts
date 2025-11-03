@@ -245,15 +245,15 @@ export const buttonContributions: ButtonContributionParams[] = [
 		match: () => {
 			return isGitlabHost() && window.location.pathname.includes("/-/merge_requests/");
 		},
-		selector: "body[data-project-id] div.detail-page-header-actions.is-merge-request > div",
+		// new structure as of 2025:
+		selector: "body[data-project-id] div.detail-page-header.is-merge-request .js-issuable-actions",
 		containerElement: createElement("div", { marginLeft: "8px", marginRight: "-8px" }),
 		application: "gitlab",
-		insertBefore: "body[data-project-id] div.detail-page-header-actions.is-merge-request > div > div",
+		insertBefore: "body[data-project-id] div.detail-page-header.is-merge-request .js-issuable-actions > *:first-child",
 		manipulations: [
 			{
-				// make the clone button secondary
-				element:
-					"#content-body > div.merge-request > div.detail-page-header.border-bottom-0.gl-display-block.gl-pt-5.gl-sm-display-flex\\!.is-merge-request > div.detail-page-header-actions.gl-align-self-start.is-merge-request.js-issuable-actions.gl-display-flex > div > div.gl-sm-ml-3.dropdown.gl-dropdown > button",
+				// make the 'Code' dropdown secondary (GitLab renamed buttons)
+				element: "body[data-project-id] div.detail-page-header.is-merge-request .js-issuable-actions button",
 				remove: "btn-confirm",
 			},
 		],
