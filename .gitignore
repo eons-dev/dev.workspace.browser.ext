@@ -4,3 +4,4 @@ dist
 eons-dev-launcher
 *lock.*
 src/manifest.json
+public/

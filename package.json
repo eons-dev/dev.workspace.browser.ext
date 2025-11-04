@@ -5,7 +5,9 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "pnpm run prebuild && vite build",
-		"prebuild": "node sh/copy-manifest.js",
+		"prebuild": "pnpm run prebuild:manifest && pnpm run prebuild:icons",
+		"prebuild:manifest": "node sh/copy-manifest.js",
+		"prebuild:icons": "node sh/copy-icons.js",
 		"build:chrome": "BROWSER=chromium pnpm run build",
 		"build:firefox": "BROWSER=gecko pnpm run build"
 	},
