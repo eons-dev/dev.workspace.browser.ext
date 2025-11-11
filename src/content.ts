@@ -64,14 +64,20 @@ async function getBaseUrlTemplate(): Promise<string> {
  *
  * @param template - The Liquid template string (e.g. "{{ repoUrl }}").
  * @param repoUrl - The normalized repository URL to inject into the template.
+ * @param branchName - The branch name extracted from the URL (optional).
  * @returns The fully rendered workspace URL.
  */
 async function renderWorkspaceUrl(
 	template: string,
-	repoUrl: string
+	repoUrl: string,
+	branchName: string | null = null
 ): Promise<string> {
 	try {
-		return await liquid.parseAndRender(template, { repoUrl });
+		const templateData: { repoUrl: string; branchName?: string } = { repoUrl };
+		if (branchName) {
+			templateData.branchName = branchName;
+		}
+		return await liquid.parseAndRender(template, templateData);
 	} catch {
 		return `https://workspace.infrastructure.tech/#/cast/dev?kasm_url=${encodeURIComponent(
 			repoUrl
@@ -124,6 +130,33 @@ async function pollForCondition<T>(
 		const result = condition();
 		if (result) return result;
 		await new Promise((resolve) => setTimeout(resolve, intervalMs));
+	}
+
+	return null;
+}
+
+// ============================================================================
+// Branch Name Extraction
+// ============================================================================
+
+/**
+ * Extracts the branch name from the current URL path.
+ * Works for both GitHub and GitLab branch URLs.
+ *
+ * @param url - The current URL to extract the branch from.
+ * @returns The branch name if found, otherwise null.
+ */
+function extractBranchFromUrl(url: string): string | null {
+	// GitHub: /tree/branch-name
+	const githubMatch = url.match(/\/tree\/([^/]+)/);
+	if (githubMatch) {
+		return decodeURIComponent(githubMatch[1]);
+	}
+
+	// GitLab: /-/tree/branch-name
+	const gitlabMatch = url.match(/\/-\/tree\/([^/]+)/);
+	if (gitlabMatch) {
+		return decodeURIComponent(gitlabMatch[1]);
 	}
 
 	return null;
@@ -492,8 +525,9 @@ async function injectEonsButton(): Promise<void> {
 
 		// Prepare workspace URL
 		const repoUrl = await normalizeRepoUrl(currentUrl);
+		const branchName = extractBranchFromUrl(repoUrl);
 		const template = await getBaseUrlTemplate();
-		const workspaceUrl = await renderWorkspaceUrl(template, repoUrl);
+		const workspaceUrl = await renderWorkspaceUrl(template, repoUrl, branchName);
 
 		// Try each contribution until one succeeds
 		for (const contribution of buttonContributions) {
